@@ -3,34 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Diferencias y Porcentajes</title>
+  <title>Diferencias</title>
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; }
-    input { margin: 5px 0; display: block; }
-    .resultado { margin-top: 20px; }
+    .campo { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+    .campo input[type="number"] { width: 100px; }
+    .campo input[readonly] { background-color: #f0f0f0; width: 100px; text-align: center; }
+    .positivo { color: red; font-weight: bold; }
+    .negativo { color: green; font-weight: bold; }
   </style>
 </head>
 <body>
-  <h1>Calculadora de diferencias y porcentajes</h1>
+  <h1>Calculadora de diferencias</h1>
 
   <form id="formulario">
-    <label>Valor 1: <input type="number" id="valor1"></label>
-    <label>Valor 2: <input type="number" id="valor2"></label>
-    <label>Valor 3: <input type="number" id="valor3"></label>
-    <label>Valor 4: <input type="number" id="valor4"></label>
-    <label>Valor 5: <input type="number" id="valor5"></label>
-    <label>Valor 6: <input type="number" id="valor6"></label>
+    <div class="campo"><label>Valor 1: <input type="number" id="valor1"></label> <input type="text" id="dif1" readonly></div>
+    <div class="campo"><label>Valor 2: <input type="number" id="valor2"></label> <input type="text" id="dif2" readonly></div>
+    <div class="campo"><label>Valor 3: <input type="number" id="valor3"></label> <input type="text" id="dif3" readonly></div>
+    <div class="campo"><label>Valor 4: <input type="number" id="valor4"></label> <input type="text" id="dif4" readonly></div>
+    <div class="campo"><label>Valor 5: <input type="number" id="valor5"></label> <input type="text" id="dif5" readonly></div>
+    <div class="campo"><label>Valor 6: <input type="number" id="valor6"></label> <input type="text" id="dif6" readonly></div>
     <button type="submit">Calcular</button>
   </form>
 
   <button id="limpiar">Limpiar datos</button>
 
-  <div class="resultado" id="resultado"></div>
-
   <script>
     const campos = ["valor1", "valor2", "valor3", "valor4", "valor5", "valor6"];
 
-    // Cargar valores guardados
     window.onload = function () {
       campos.forEach(id => {
         const valorGuardado = localStorage.getItem(id);
@@ -38,31 +38,40 @@
           document.getElementById(id).value = valorGuardado;
         }
       });
+      calcularDiferencias();
     };
 
-    // Guardar y calcular
     document.getElementById('formulario').addEventListener('submit', function(e) {
       e.preventDefault();
-      const valores = [];
       campos.forEach(id => {
         const val = parseFloat(document.getElementById(id).value);
         if (!isNaN(val)) {
-          valores.push(val);
           localStorage.setItem(id, val);
         }
       });
-
-      let output = '';
-      for (let i = 1; i < valores.length; i++) {
-        const dif = valores[i] - valores[i - 1];
-        const porcentaje = ((dif / valores[i - 1]) * 100).toFixed(2);
-        output += `<p>Día ${i + 1} vs Día ${i}: Diferencia = ${dif}, Porcentaje = ${porcentaje}%</p>`;
-      }
-
-      document.getElementById('resultado').innerHTML = output;
+      calcularDiferencias();
     });
 
-    // Botón para limpiar los datos guardados
+    function calcularDiferencias() {
+      const valores = campos.map(id => parseFloat(document.getElementById(id).value) || null);
+      for (let i = 0; i < valores.length; i++) {
+        const difInput = document.getElementById(`dif${i + 1}`);
+        difInput.classList.remove("positivo", "negativo");
+
+        if (i > 0 && valores[i] !== null && valores[i - 1] !== null) {
+          const dif = valores[i] - valores[i - 1];
+          difInput.value = dif;
+          if (dif > 0) {
+            difInput.classList.add("positivo");
+          } else if (dif < 0) {
+            difInput.classList.add("negativo");
+          }
+        } else {
+          difInput.value = '';
+        }
+      }
+    }
+
     document.getElementById('limpiar').addEventListener('click', function() {
       campos.forEach(id => localStorage.removeItem(id));
       location.reload();
