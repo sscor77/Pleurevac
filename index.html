@@ -55,7 +55,11 @@
     function calcularDiferencias() {
       const valores = campos.map(id => parseFloat(document.getElementById(id).value) || null);
       for (let i = 0; i < valores.length; i++) {
+        const valorInput = document.getElementById(campos[i]);
         const difInput = document.getElementById(`dif${i + 1}`);
+
+        // Limpiar estilos anteriores
+        valorInput.classList.remove("positivo", "negativo");
         difInput.classList.remove("positivo", "negativo");
 
         if (valores[i] !== null) {
@@ -64,10 +68,19 @@
           } else if (valores[i - 1] !== null) {
             const dif = valores[i] - valores[i - 1];
             difInput.value = dif;
+
+            // Estilo para la casilla de diferencia
             if (dif < 0) {
               difInput.classList.add("negativo");
             } else if (dif > 0) {
               difInput.classList.add("positivo");
+            }
+
+            // Estilo para la casilla del valor
+            if (valores[i] < valores[i - 1]) {
+              valorInput.classList.add("negativo");
+            } else if (valores[i] > valores[i - 1]) {
+              valorInput.classList.add("positivo");
             }
           } else {
             difInput.value = '';
